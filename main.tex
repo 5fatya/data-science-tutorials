@@ -1,0 +1,195 @@
+\documentclass{beamer}
+
+% ---------- Minimal, stable setup ----------
+\usetheme{Madrid}
+\usecolortheme{default}
+\usefonttheme{professionalfonts}
+\setbeamertemplate{navigation symbols}{}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+
+\title{Introduction to NumPy}
+\author{Fatima Fares}
+\institute{Constructor University}
+\date{\today}
+
+\begin{document}
+
+% ---------- Title ----------
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% ---------- Slide 1 ----------
+\begin{frame}[fragile]{Introduction to NumPy}
+\begin{itemize}
+  \item Python's library for fast numerical computing
+  \item Provides \texttt{ndarray} (multi-dimensional arrays)
+  \item Vectorized operations (avoid explicit Python loops)
+  \item Standard import:
+\end{itemize}
+\begin{verbatim}
+import numpy as np
+\end{verbatim}
+\end{frame}
+
+% ---------- Slide 2 ----------
+\begin{frame}[fragile]{Lists vs. Arrays}
+\begin{itemize}
+  \item Lists: flexible, slower, allow mixed types
+  \item Arrays: fixed dtype, fast, optimized for math
+\end{itemize}
+\begin{verbatim}
+lst = [1, 2, 3]
+print(3*lst)         # [1, 2, 3, 1, 2, 3, 1, 2, 3]
+
+arr = np.array([1, 2, 3])
+print(3*arr)         # [3, 6, 9]
+\end{verbatim}
+\end{frame}
+
+% ---------- Slide 3 ----------
+\begin{frame}[fragile]{Indexing \& Slicing}
+\begin{itemize}
+  \item Same basics as Python lists
+  \item Negative indices allowed
+  \item Slices often return \textbf{views} (changes may affect original)
+\end{itemize}
+\begin{verbatim}
+a = np.array([10, 20, 30, 40])
+print(a[1:3])        # [20 30]
+a[1:3] = 99
+print(a)             # [10 99 99 40]
+\end{verbatim}
+\end{frame}
+
+% ---------- Slide 4 ----------
+\begin{frame}[fragile]{Reshaping \& Flattening}
+\begin{itemize}
+  \item \texttt{reshape(r, c)} to change shape (compatible sizes)
+  \item \texttt{flatten()} returns a copy
+  \item \texttt{ravel()} returns a view (when possible)
+\end{itemize}
+\begin{verbatim}
+b = np.arange(6).reshape(2, 3)
+print(b)             # [[0 1 2]
+                     #  [3 4 5]]
+v = b.ravel()
+v[0] = -1
+print(b)             # [[-1  1  2]
+                     #  [ 3  4  5]]
+\end{verbatim}
+\end{frame}
+
+% ---------- Slide 5 ----------
+\begin{frame}[fragile]{Array Creators}
+\begin{verbatim}
+np.zeros((2, 3))
+np.ones((2, 3))
+np.full((2, 3), 7)
+
+np.arange(0, 10, 2)     # [0 2 4 6 8]
+np.linspace(0, 1, 5)    # [0.   0.25 0.5  0.75 1.  ]
+\end{verbatim}
+\begin{itemize}
+  \item Prefer \texttt{linspace} for floats (reliable endpoints)
+\end{itemize}
+\end{frame}
+
+% ---------- Slide 6 ----------
+\begin{frame}[fragile]{Boolean Masks}
+\begin{itemize}
+  \item Build logical conditions to select or assign
+  \item Use \texttt{\&}, \texttt{|}, \texttt{\string~} (bitwise), not \texttt{and}/\texttt{or}/\texttt{not}
+\end{itemize}
+\begin{verbatim}
+a = np.arange(10)
+mask = (a > 3) & (a < 7)
+print(a[mask])         # [4 5 6]
+
+a[mask] = 99
+print(a)               # [0 1 2 3 99 99 99 7 8 9]
+\end{verbatim}
+\end{frame}
+
+% ---------- Slide 7 ----------
+\begin{frame}[fragile]{Math \& Reductions}
+\begin{itemize}
+  \item Elementwise: +, -, *, /, ** and \texttt{np.exp}, \texttt{np.log}, \texttt{np.sin}, \dots
+  \item Reductions: \texttt{sum}, \texttt{mean}, \texttt{max}, \texttt{argmax} with \texttt{axis}
+\end{itemize}
+\begin{verbatim}
+b = np.array([[1, 2, 3],
+              [4, 5, 6]])
+
+print(b.sum())        # 21
+print(b.sum(axis=0))  # [5 7 9]  (columns)
+print(b.sum(axis=1))  # [6 15]   (rows)
+\end{verbatim}
+\end{frame}
+
+% ---------- Slide 8 ----------
+\begin{frame}[fragile]{Practical Patterns}
+\begin{verbatim}
+# dtype control
+x = np.array([1, 2, 3], dtype='float64')
+
+# striding (every third element starting at index 2)
+a = np.arange(12)
+a[2::3] = -a[2::3]
+
+# string arrays + reshape
+s = np.array(list("abcdef")).reshape(3, 2)
+s.ravel()[1::2] = '*'
+
+# mask combinations (negative even -> 42)
+arr = np.array([-3, -2, -1, 0, 1, 2])
+arr[(arr < 0) & (arr % 2 == 0)] = 42
+\end{verbatim}
+\end{frame}
+
+% ---------- Slide 9 ----------
+\begin{frame}[fragile]{File Input \& Statistics}
+\begin{itemize}
+  \item Read numeric data (skip header if present)
+\end{itemize}
+\begin{verbatim}
+data = np.genfromtxt("data.txt", skip_header=1)
+\end{verbatim}
+\begin{itemize}
+  \item Column means / row-wise maxima:
+\end{itemize}
+\begin{verbatim}
+col_means = data.mean(axis=0)
+row_argmax = data.argmax(axis=1)
+
+# Count how often column 0 is the max in its row:
+count_max_col0 = (row_argmax == 0).sum()
+\end{verbatim}
+\end{frame}
+
+% ---------- Slide 10 ----------
+\begin{frame}{Common Pitfalls}
+\begin{itemize}
+  \item Using \texttt{and}/\texttt{or} instead of \texttt{\&}/\texttt{|} for masks
+  \item Expecting \texttt{flatten()} to be a view (it makes a copy)
+  \item Dtype upcasting surprises (e.g., int + float $\rightarrow$ float)
+  \item \texttt{np.arange} with floats may miss the stop value
+\end{itemize}
+\end{frame}
+
+
+% ---------- Slide 11 ----------
+\begin{frame}{Key Takeaways}
+\begin{itemize}
+  \item NumPy arrays give Python speed and power.
+  \item Indexing and reshaping let you slice and organize data easily.
+  \item Boolean masks are your replacement for loops.
+  \item Views vs copies is the most important concept for debugging.
+  \item Practice is the best way to get comfortable.
+\end{itemize}
+\end{frame}
+
+
+\end{document}
